@@ -1,0 +1,16 @@
+---
+
+- name: install monit package
+  apt: name=monit state=present
+
+- name: copy monit's monitrc configuration file
+  template: src=monitrc.j2 dest=/etc/monit/monitrc
+  notify:
+    - restart monit
+
+- name: copy service configurations
+  copy: src={{ item }}.conf dest=/etc/monit/conf.d/{{ item }}.conf
+  with_items: "{{ monit_services }}"
+  when: item is defined
+  notify:
+    - restart monit
